@@ -1,0 +1,101 @@
+Use HR database for below queries
+1. WAQ to display second highest salary in HR schema.
+	
+postgres=# select max(salary) from employees where salary<(select max(salary)from employees);
+   max
+----------
+ 17000.00
+(1 row)
+	
+
+	
+
+
+
+
+2. WAQ to display name of employee who is earning maximum in his/her department.
+
+	select first_name from employees e where salary=(select max(salary) from employees where department_id=e.department_id);
+ first_name
+------------
+ Steven
+ Alexander
+ Nancy
+ Den
+ Adam
+ John
+ Jennifer
+ Michael
+ Susan
+ Hermann
+ Shelley
+(11 rows)
+
+3. WAQ to display emplyees count who are working from same location.
+
+	select count(e.first_name) from employees e,departments d,locations l where e.department_id=d.department_id and d.location_id=l.location_id group by city;
+ count
+-------
+     5
+     1
+    45
+     2
+    18
+    34
+     1
+(7 rows)
+
+
+4. WAQ to display number of employees joined year wise.
+
+	select to_char(hire_date,'yyyy'),count(first_name) as Year from employees group by to_char(hire_date,'yyyy');
+ to_char | year
+---------+------
+ 1996    |   10
+ 1990    |    1
+ 2000    |   11
+ 1994    |    7
+ 1987    |    2
+ 1993    |    1
+ 1997    |   28
+ 1991    |    1
+ 1989    |    1
+ 1998    |   23
+ 1995    |    4
+ 1999    |   18
+(12 rows)
+
+5. WAQ to top 2 earning employee name and salary in each department.
+
+
+postgres=# select emp1.department_id, emp1.salary, emp1.first_name
+postgres-# from employees emp1
+postgres-# where (
+postgres(# select count(distinct(emp2.salary))
+postgres(# from employees emp2
+postgres(# where emp2.salary>emp1.salary and emp1.department_id=emp2.department_id) in (0,1) group by emp1.department_id, emp1.salary,emp1.first_name
+postgres-# order by emp1.department_id, salary desc;
+ department_id |  salary  | first_name
+---------------+----------+------------
+            10 |  4400.00 | Jennifer
+            20 | 13000.00 | Michael
+            20 |  6000.00 | Pat
+            30 | 11000.00 | Den
+            30 |  3100.00 | Alexander
+            40 |  6500.00 | Susan
+            50 |  8200.00 | Adam
+            50 |  8000.00 | Matthew
+            60 |  9000.00 | Alexander
+            60 |  6000.00 | Bruce
+            70 | 10000.00 | Hermann
+            80 | 14000.00 | John
+            80 | 13500.00 | Karen
+            90 | 24000.00 | Steven
+            90 | 17000.00 | Lex
+            90 | 17000.00 | Neena
+           100 | 12000.00 | Nancy
+           100 |  9000.00 | Daniel
+           110 | 12000.00 | Shelley
+           110 |  8300.00 | William
+               |  7000.00 | Kimberely
+(21 rows)
